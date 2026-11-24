@@ -1,0 +1,5 @@
+-- Este archivo antiguo ya no es válido. El esquema real vive en el proyecto Supabase
+-- czsxxznvhxkxapxlygyo y se aplicó con estas migraciones (en orden):
+--   radio_pda_schema, penal_code_global, licencias_001_schema,
+--   licencias_002_functions, radio_penal_global
+-- Consúltalas con: list_migrations / Dashboard > Database > Migrations.

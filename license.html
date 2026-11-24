@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Licencia</title>
+<style>
+:root{--bg:#0f1115;--p:#171a21;--b:#2a303c;--t:#e8ecf3;--m:#8d97a8;--a:#78a8ff;--e:#f87171;--w:#fbbf24}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:radial-gradient(900px 500px at 50% -10%,#1b2744,var(--bg));color:var(--t);font:14px/1.5 system-ui,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;padding:28px 32px;overflow:auto}
+img.lg{height:30px;margin-bottom:6px;opacity:.95}.pn{font-size:12px;color:var(--m);letter-spacing:.14em;text-transform:uppercase;margin-bottom:22px}
+.card{width:100%;background:var(--p);border:1px solid var(--b);border-radius:14px;padding:22px}
+h1{font-size:19px;margin:0 0 6px}p{color:var(--m);margin:0 0 14px}
+.tabs{display:flex;gap:4px;background:#0f1115;border-radius:10px;padding:3px;margin-bottom:16px}.tabs button{flex:1;background:none;border:0;color:var(--m);padding:8px;border-radius:8px;cursor:pointer;font:inherit}.tabs button.on{background:#232937;color:var(--t)}
+label{display:block;font-size:12px;color:var(--m);margin:12px 0 4px}input{width:100%;background:#0f1115;border:1px solid var(--b);color:var(--t);border-radius:9px;padding:10px 12px;font:inherit}input:focus{outline:2px solid var(--a);outline-offset:-1px}
+#serial{font-family:ui-monospace,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase}
+.btn{background:var(--a);color:#06101f;border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer;width:100%;margin-top:18px}.btn.g{background:#232937;color:var(--t);margin-top:10px}.btn[disabled]{opacity:.5;cursor:wait}
+.err{background:#3a1d1f;border:1px solid #5a2a2d;color:#fecaca;border-radius:10px;padding:10px 12px;margin-top:14px;font-size:13px}.err b{display:block}
+.ico{width:54px;height:54px;border-radius:50%;background:#3a1d1f;color:var(--e);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 14px}.ico.w{background:#3a2e12;color:var(--w)}
+.center{text-align:center}.fix{background:#0f1115;border:1px solid var(--b);border-radius:10px;padding:10px 12px;font-size:13px;margin:12px 0;text-align:left}.fix b{color:var(--a)}
+.code{font:11px ui-monospace,Consolas,monospace;color:var(--m);margin-top:8px}.foot{margin-top:auto;padding-top:18px;font-size:11px;color:#5d6676;text-align:center}
+.hidden{display:none!important}
+</style></head><body>
+<img class="lg" src="assets/logo_sintaxis.png" alt="Sintaxis Studio" onerror="this.style.display='none'"><div class="pn" id="pn">Activación</div>
+<div class="card" id="card"></div>
+<div class="foot">Sintaxis Studio · Sistema de licencias · Simulación de rol, proyecto no oficial</div>
+<script>
+const E={
+ NEEDS_ACTIVATION:["","",""],
+ SERIAL_INVALID:["Número de serie no válido","El código no existe o está mal escrito.","Revisa que sea el código que te entregó el administrador (formato RAD-XXXX-XXXX-XXXX)."],
+ SERIAL_USED:["Número de serie ya utilizado","Este código ya está vinculado a otra radio.","Cada código sirve para una sola radio. Pide uno nuevo al administrador o que libere el anterior."],
+ SERIAL_BLOCKED:["Número de serie bloqueado","El administrador ha bloqueado o revocado este código.","Contacta con quien te lo entregó."],
+ LICENSE_NOT_FOUND:["Licencia no encontrada","No hay una licencia válida asociada a este código.","Contacta con el administrador de tu licencia."],
+ LICENSE_SUSPENDED:["Licencia suspendida","La licencia de tu organización está suspendida.","Contacta con el administrador. Cuando la reactive, pulsa «Reintentar»."],
+ LICENSE_EXPIRED:["Licencia caducada","La licencia ha llegado a su fecha de caducidad.","Pide al administrador que la renueve y pulsa «Reintentar»."],
+ RADIO_LIMIT:["Límite de radios alcanzado","La licencia ya tiene todas sus radios en uso.","El administrador puede liberar una radio que ya no se use o ampliar la licencia."],
+ USER_LIMIT:["Límite de usuarios alcanzado","La licencia ya tiene todos sus usuarios registrados.","El administrador puede desactivar usuarios que no se usen o ampliar el límite."],
+ USER_NOT_AUTHORIZED:["Usuario no autorizado","Tu cuenta no tiene permiso para usar radios de esta licencia o está desactivada.","Pide al administrador que active tu cuenta."],
+ DEVICE_BLOCKED:["Dispositivo bloqueado","Esta radio ha sido bloqueada.","Contacta con el administrador. Si copiaste la instalación a otro equipo, instala de nuevo con tu propio código."],
+ OFFLINE:["No se puede verificar la licencia","No hay conexión con el servidor de licencias y el permiso guardado en este equipo ha caducado.","Conéctate a Internet y pulsa «Reintentar». Sin conexión la radio funciona hasta 24 horas desde la última comprobación."],
+ BAD_CREDENTIALS:["Correo o contraseña incorrectos","No hemos podido iniciar sesión con esos datos.","Revísalos e inténtalo de nuevo."],
+ CLOCK_SKEW:["Fecha y hora del equipo incorrectas","El reloj de este equipo no coincide con el del servidor.","Sincroniza la fecha y la hora de Windows y pulsa «Reintentar»."],
+ CLOCK_TAMPER:["Fecha y hora del equipo incorrectas","Se ha detectado que el reloj del equipo va por detrás de la última comprobación.","Corrige la fecha y la hora de Windows y pulsa «Reintentar»."],
+ RATE_LIMITED:["Demasiados intentos","Has hecho demasiadas peticiones seguidas.","Espera unos minutos y vuelve a intentarlo."],
+ BAD_REQUEST:["Datos no válidos","Revisa que todos los campos estén completos.","La contraseña debe tener entre 8 y 72 caracteres."],
+ DEVICE_ALREADY_ACTIVE:["Esta radio ya está activada","","Reinicia la aplicación."],
+ SERVER_KEY_MISMATCH:["Servidor no reconocido","La respuesta no procede del servidor oficial de licencias.","No sigas con la instalación y contacta con el administrador."],
+ AUTH_INVALID:["Autorización no válida","El permiso guardado en este equipo no es válido.","Pulsa «Reintentar». Si persiste, vuelve a activar la radio."],
+ SERVER_ERROR:["Error del servidor","El servidor de licencias no ha respondido correctamente.","Inténtalo de nuevo en unos minutos."],
+ TICKET_EXPIRED:["Sesión de activación caducada","Ha pasado demasiado tiempo.","Vuelve a pulsar «Activar»."]
+};
+const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const q=new URLSearchParams(location.search);$("#pn").textContent=(q.get("name")||"Radio")+(q.get("v")?" · v"+q.get("v"):"");
+const info=c=>E[c]||["Error de licencia",c||"","Reinténtalo o contacta con el administrador."];
+let mode="login",busy=false;
+function errBox(c){const i=info(c);return `<div class="err"><b>${esc(i[0])}</b>${esc(i[1])}${i[2]?`<br><span style="opacity:.85">${esc(i[2])}</span>`:""}</div>`}
+function activate(msg){
+ $("#card").innerHTML=`<h1>Activa tu radio</h1><p>Introduce el número de serie que te entregó el administrador y tu cuenta.</p>
+ <div class="tabs"><button data-m="login" class="${mode==="login"?"on":""}">Ya tengo cuenta</button><button data-m="create" class="${mode==="create"?"on":""}">Crear cuenta</button></div>
+ <label>Número de serie</label><input id="serial" placeholder="RAD-XXXX-XXXX-XXXX" maxlength="18" autocomplete="off" value="${esc(activate.s||"")}">
+ ${mode==="create"?`<label>Nombre</label><input id="name" maxlength="60" autocomplete="name" value="${esc(activate.n||"")}">`:""}
+ <label>Correo electrónico</label><input id="email" type="email" autocomplete="username" value="${esc(activate.e||"")}">
+ <label>Contraseña ${mode==="create"?"(mínimo 8 caracteres)":""}</label><input id="pass" type="password" autocomplete="${mode==="create"?"new-password":"current-password"}" maxlength="72">
+ <div id="m">${msg?errBox(msg):""}</div><button class="btn" id="go">Activar</button><button class="btn g" id="quit">Salir</button>`;
+ document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{keep();mode=b.dataset.m;activate()});
+ $("#quit").onclick=()=>lic.quit();
+ $("#serial").oninput=e=>{let v=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"");if(v.startsWith("RAD"))v=v.slice(3);v=v.slice(0,12);e.target.value=v?"RAD-"+v.match(/.{1,4}/g).join("-"):""};
+ $("#go").onclick=submit;document.querySelectorAll("input").forEach(i=>i.onkeydown=e=>{if(e.key==="Enter")submit()});
+}
+const keep=()=>{activate.s=($("#serial")||{}).value;activate.e=($("#email")||{}).value;activate.n=($("#name")||{}).value};
+async function submit(){
+ if(busy)return;const serial=$("#serial").value.trim(),email=$("#email").value.trim(),password=$("#pass").value;
+ if(serial.length<18||!email||password.length<(mode==="create"?8:1)){$("#m").innerHTML=errBox("BAD_REQUEST");return}
+ busy=true;$("#go").disabled=true;$("#go").textContent="Comprobando…";keep();
+ const r=await lic.activate({serial,email,password,name:(($("#name")||{}).value||""),create:mode==="create"}).catch(()=>({ok:false,error:"SERVER_ERROR"}));
+ busy=false;if(r.ok)return;
+ if(["DEVICE_BLOCKED","CLOCK_TAMPER","SERVER_KEY_MISMATCH"].includes(r.error))return blocked(r.error);
+ activate(r.error);
+}
+function blocked(c){const i=info(c);const soft=["OFFLINE","CLOCK_SKEW","CLOCK_TAMPER","RATE_LIMITED","SERVER_ERROR"].includes(c);
+ $("#card").innerHTML=`<div class="center"><div class="ico ${soft?"w":""}">${soft?"!":"×"}</div><h1>${esc(i[0])}</h1><p>${esc(i[1])}</p></div><div class="fix"><b>Qué hacer</b><br>${esc(i[2])}</div><div class="center code">Código: ${esc(c)}</div><button class="btn" id="rt">Reintentar</button><button class="btn g" id="quit">Salir</button>`;
+ $("#quit").onclick=()=>lic.quit();
+ $("#rt").onclick=async()=>{$("#rt").disabled=true;$("#rt").textContent="Comprobando…";const r=await lic.retry().catch(()=>({ok:false,model:{screen:"error",error:"SERVER_ERROR"}}));if(!r.ok)show(r.model)};}
+function show(m){if(!m)return;if(m.screen==="activate")activate(m.error==="NEEDS_ACTIVATION"||m.error==="DEVICE_NOT_ACTIVATED"||m.error==="DEVICE_NOT_FOUND"?(m.error==="NEEDS_ACTIVATION"?"":"DEVICE_RELEASED"):m.error);else blocked(m.error)}
+E.DEVICE_RELEASED=["Esta radio se ha liberado","El administrador ha liberado la asignación de esta radio.","Vuelve a activarla con un número de serie disponible."];
+lic.onModel(show);lic.model().then(m=>m&&show(m));
+</script></body></html>
